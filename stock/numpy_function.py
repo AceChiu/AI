@@ -1,6 +1,10 @@
 import yfinance as yf
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+import datetime as datetime
+import matplotlib.dates as mdates
+
 
 # # 定義股票代碼
 # ticker = "2330.TW"
@@ -116,10 +120,56 @@ def testVolatility():
     print("annual_volatility:", annual_volatility)
     print("monthly_volatility:", monthly_volatility)
 
+def testSMA():
+    file_name = "./2330_stock_data.csv"
+
+    # 读取数据，确保日期列是字符串，价格列是浮点数
+    data = np.loadtxt(
+        fname=file_name,
+        delimiter=',',
+        usecols=(0, 1), 
+        dtype=str,  # 先把所有数据读入为字符串
+        unpack=True,
+        skiprows=1
+    )
+
+    raw_date = data[0]  # 日期列
+    end_price = data[1].astype(float)  # 转换价格列为浮点数
+
+    date = np.array([datetime.datetime.strptime(d, "%Y-%m-%d") for d in raw_date])
+
+    N_values = [5, 20, 60]  # 定义不同的 SMA 计算周期
+    colors = ['r', 'g', 'b']  # 颜色分别用于 5, 20, 60 日 SMA
+    labels = ['SMA-5', 'SMA-20', 'SMA-60']  # 线条标签
+    
+    plt.figure(figsize=(12, 6))
+    plt.plot(date, end_price, color='gray', label='Stock Price', alpha=0.5)  # 画出原始价格曲线
+
+    for N, color, label in zip(N_values, colors, labels):
+        weights = np.ones(N) / N
+        sma = np.convolve(weights, end_price.astype(float), mode='valid')  # 计算 SMA
+        sma_dates = date[N-1:]  # 对应的日期要裁剪
+
+        plt.plot(sma_dates, sma, color=color, linewidth=2, label=label)  # 绘制 SMA 线
+
+    # 设置 X 轴格式，使日期美观
+    plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))  # 格式化 X 轴
+    plt.gca().xaxis.set_major_locator(mdates.AutoDateLocator())  # 自动选择适合的刻度
+    plt.xticks(rotation=45)  # 旋转 X 轴标签，避免重叠
+
+    plt.legend()
+    plt.title("Stock Price and SMA")
+    plt.xlabel("Date")
+    plt.ylabel("Price")
+    plt.grid(True)  # 添加网格
+    plt.show()
+
+
 # testReadFile()
 # testMaxAndMin()
 # testPtp()
 # testAVG()
 # testMedian()
 # testVar()
-testVolatility()
+# testVolatility()
+testSMA()
