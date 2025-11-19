@@ -8,6 +8,7 @@ def get_stock_data(ticker, period="5y"):
         raise ValueError("⚠️ Yahoo Finance 没有下载到数据，检查股票代码或网络连接")
     return df
 
+//波動率
 def calculate_volatility(df, window=252):
     df["Returns"] = df["Close"].pct_change()
     df["Volatility"] = df["Returns"].rolling(window=window, min_periods=1).std() * np.sqrt(window)

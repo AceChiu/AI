@@ -165,6 +165,40 @@ def testSMA():
     plt.show()
 
 
+def testEXP():
+    x = np.arange(5)
+    y = np.arange(10)
+    print("x:", x)
+    print("y:", x)
+    print("Exp x:", np.exp(x))
+    print("Exp y:", np.exp(y))
+    print("Linespace:", np.linspace(-1,0,5))
+
+
+def testEMA():
+    file_name = "./2330_stock_data.csv"
+
+    end_price, volume  = np.loadtxt(
+        fname=file_name,
+        delimiter=',',
+        usecols=(1, 5), 
+        unpack=True,
+        skiprows=1 
+    )
+    N = 5
+    weights = np.exp(np.linspace(-1,0,N))
+    weights /= weights.sum()
+    print(weights)
+    ema = np.convolve(weights, end_price)[N-1:-N+1]
+    print(ema)
+
+    t = np.arange(N-1,len(end_price))
+    plt.plot(t,end_price[N-1:],lw=1.0)
+    plt.plot(t,ema,lw=2.0)
+    plt.show()
+    
+
+
 # testReadFile()
 # testMaxAndMin()
 # testPtp()
@@ -172,4 +206,6 @@ def testSMA():
 # testMedian()
 # testVar()
 # testVolatility()
-testSMA()
+# testSMA()
+# testEXP()
+testEMA()
